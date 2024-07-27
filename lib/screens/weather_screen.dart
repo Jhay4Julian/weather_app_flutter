@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:weather_app_flutter/models/weather_model.dart';
 import 'package:weather_app_flutter/services/weather_service.dart';
@@ -44,7 +42,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.cityName),
+        title: Text(
+          widget.cityName,
+          style: const TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -74,7 +75,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
           child: _isLoading
               ? const CircularProgressIndicator()
               : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Column(
                       children: [
@@ -86,8 +87,18 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         ),
                       ],
                     ),
+                    TempCard(
+                      temperature: '${_weather?.temperature.round()}°',
+                      feelslike: 'feels like ${_weather?.feelsLike}°',
+                    ),
                     const SizedBox(height: 30),
-                    TempCard(tempDigit: '${_weather?.temperature.round()}°'),
+                    PropTile(title: 'Humidity', value: '${_weather?.humidity}'),
+                    PropTile(
+                        title: 'Visibility', value: '${_weather?.humidity}'),
+                    PropTile(
+                        title: 'Wind Speed', value: '${_weather?.windSpeed}'),
+                    PropTile(
+                        title: 'Wind Degree', value: '${_weather?.windDeg}'),
                   ],
                 ),
         ),
@@ -97,8 +108,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
 }
 
 class TempCard extends StatelessWidget {
-  final String tempDigit;
-  const TempCard({super.key, required this.tempDigit});
+  final String temperature;
+  final String feelslike;
+  const TempCard(
+      {super.key, required this.temperature, required this.feelslike});
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +126,55 @@ class TempCard extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-        child: Text(
-          tempDigit,
-          style: const TextStyle(fontSize: 50, color: Colors.white),
+        child: Column(
+          children: [
+            Text(
+              temperature,
+              style: const TextStyle(fontSize: 50, color: Colors.white),
+            ),
+            Text(
+              feelslike,
+              style: const TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+/// For the other weather properties
+
+class PropTile extends StatelessWidget {
+  final String title;
+  final String value;
+  const PropTile({super.key, required this.title, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 180,
+      margin: const EdgeInsets.only(left: 20, right: 20),
+      padding: const EdgeInsets.all(10),
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF5936B4),
+              Color(0xFF362A84),
+            ],
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(title,
+              style: const TextStyle(fontSize: 15, color: Colors.white)),
+          const Text('-', style: TextStyle(fontSize: 18, color: Colors.white)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 17, color: Colors.white),
+          ),
+        ],
       ),
     );
   }
