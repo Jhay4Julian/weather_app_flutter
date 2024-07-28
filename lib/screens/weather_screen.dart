@@ -140,8 +140,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
                           right: 30,
                           top: 10,
                           child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStatePropertyAll(
+                                Colors.indigo[600],
+                              ),
+                            ),
                             onPressed: convertTemp,
-                            child: Text(_isCelsius ? '°F' : '°C'),
+                            child: Text(
+                              _isCelsius ? '°F' : '°C',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 15),
+                            ),
                           ),
                         ),
                       ],
