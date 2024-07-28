@@ -64,6 +64,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _fetchWeather();
   }
 
+  bool _isCelsius = true;
+
+  void convertTemp() {
+    setState(() {
+      _isCelsius = !_isCelsius;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
