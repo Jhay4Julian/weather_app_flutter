@@ -74,6 +74,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // final celsius = _weather?.temperature.round();
+    var celsius = 10;
+    var fahrenheit = (celsius * 9 / 5) + 32;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -122,11 +125,26 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       ],
                     ),
                     // Weather Card
-                    TempCard(
-                      animation: getWeatherAnimation(_weather?.mainCondition),
-                      description: '${_weather?.description}',
-                      temperature: '${_weather?.temperature.round()}°',
-                      feelslike: 'feels like ${_weather?.feelsLike}°',
+                    Stack(
+                      children: [
+                        TempCard(
+                          animation:
+                              getWeatherAnimation(_weather?.mainCondition),
+                          description: '${_weather?.description}',
+                          // temperature: '${_weather?.temperature.round()}°',
+                          temperature:
+                              _isCelsius ? '$celsius°C' : '$fahrenheit°F',
+                          feelslike: 'feels like ${_weather?.feelsLike}°',
+                        ),
+                        Positioned(
+                          right: 30,
+                          top: 10,
+                          child: TextButton(
+                            onPressed: convertTemp,
+                            child: Text(_isCelsius ? '°F' : '°C'),
+                          ),
+                        ),
+                      ],
                     ),
 
                     // const SizedBox(height: 30),
