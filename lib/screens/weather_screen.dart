@@ -74,105 +74,107 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final celsius = _weather?.temperature.round();
-    var celsius = 10;
-    var fahrenheit = (celsius * 9 / 5) + 32;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.cityName,
-          style: const TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0, 100],
-            colors: [
-              Color(0xFF5936B4),
-              Color(0xFF362A84),
-            ],
-          )),
-        ),
-      ),
-      backgroundColor: const Color(0xFF45278B),
+    final celsius = _weather?.temperature.round() ?? 0;
+    final feelsCelsius = _weather?.feelsLike.round() ?? 0;
+    double fahrenheit = (celsius * 9 / 5) + 32;
+    double feelsFahrenheit = (feelsCelsius * 9 / 5) + 32;
 
-      /// TEST
+    return Scaffold(
+      appBar: AppBar(),
       body: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
         ),
         child: Center(
           child: _isLoading
               ? const CircularProgressIndicator()
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        const Icon(Icons.location_pin, color: Colors.red),
-                        const SizedBox(height: 5),
-                        Text(
-                          _weather?.cityName ?? 'Loading data...',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ],
-                    ),
-                    // Weather Card
-                    Stack(
-                      children: [
-                        TempCard(
-                          animation:
-                              getWeatherAnimation(_weather?.mainCondition),
-                          description: '${_weather?.description}',
-                          // temperature: '${_weather?.temperature.round()}°',
-                          temperature:
-                              _isCelsius ? '$celsius°C' : '$fahrenheit°F',
-                          feelslike: 'feels like ${_weather?.feelsLike}°',
-                        ),
-                        Positioned(
-                          right: 30,
-                          top: 10,
-                          child: TextButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
-                                Colors.indigo[600],
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 50),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          const Icon(Icons.location_pin,
+                              color: Colors.red, size: 30),
+                          const SizedBox(height: 5),
+                          Text(
+                            _weather?.cityName ?? 'Error: Incorrect input...',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                      // Weather Card
+                      Stack(
+                        children: [
+                          TempCard(
+                            animation:
+                                getWeatherAnimation(_weather?.mainCondition),
+                            description: _weather?.description == null
+                                ? 'Error'
+                                : '${_weather?.description}',
+                            temperature:
+                                _isCelsius ? '$celsius°C' : '$fahrenheit°F',
+                            feelslike: _isCelsius
+                                ? 'feels like $feelsCelsius°'
+                                : 'feels like $feelsFahrenheit°',
+                          ),
+                          Positioned(
+                            right: 30,
+                            top: 10,
+                            child: ElevatedButton(
+                              onPressed: convertTemp,
+                              child: Text(
+                                _isCelsius ? '°F' : '°C',
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            onPressed: convertTemp,
-                            child: Text(
-                              _isCelsius ? '°F' : '°C',
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 15),
-                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    // const SizedBox(height: 30),
-                    Column(
-                      children: [
-                        PropTile(
-                            title: 'Humidity', value: '${_weather?.humidity}'),
-                        PropTile(
-                            title: 'Visibility',
-                            value: '${_weather?.humidity}'),
-                        PropTile(
-                            title: 'Wind Speed',
-                            value: '${_weather?.windSpeed}'),
-                        PropTile(
-                            title: 'Wind Degree',
-                            value: '${_weather?.windDeg}'),
-                      ],
-                    )
-                  ],
+                      /// Other Weather Properties
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              PropCard(
+                                  title: 'Humidity',
+                                  value: _weather?.humidity == null
+                                      ? 'Error'
+                                      : '${_weather?.humidity}%'),
+                              PropCard(
+                                title: 'Visibility',
+                                value: _weather?.visibility == null
+                                    ? 'Error'
+                                    : '${_weather?.visibility} m',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              PropCard(
+                                title: 'Wind Speed',
+                                value: _weather?.windSpeed == null
+                                    ? 'Error'
+                                    : '${_weather?.windSpeed} m/s',
+                              ),
+                              PropCard(
+                                title: 'Wind Degree',
+                                value: _weather?.windDeg == null
+                                    ? 'Error'
+                                    : '${_weather?.windDeg}',
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
         ),
       ),
@@ -209,7 +211,6 @@ class TempCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               children: [
@@ -244,37 +245,41 @@ class TempCard extends StatelessWidget {
 }
 
 /// For the other weather properties
-
-class PropTile extends StatelessWidget {
+class PropCard extends StatelessWidget {
   final String title;
   final String value;
-  const PropTile({super.key, required this.title, required this.value});
+  const PropCard({super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
-      margin: const EdgeInsets.only(left: 20, right: 20),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(left: 10, right: 10),
+      width: 140,
+      height: 100,
       decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF5936B4),
-              Color(0xFF362A84),
-            ],
-          ),
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(title,
-              style: const TextStyle(fontSize: 15, color: Colors.white)),
-          const Text('-', style: TextStyle(fontSize: 18, color: Colors.white)),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 17, color: Colors.white),
-          ),
-        ],
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF5936B4),
+            Color(0xFF362A84),
+          ],
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 17, color: Colors.white),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 20, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
